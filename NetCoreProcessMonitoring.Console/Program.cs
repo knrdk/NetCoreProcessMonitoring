@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
+using NetCoreProcessMonitoring.Model;
+using NetCoreProcessMonitoring.Model.Repositories;
 
 namespace NetCoreProcessMonitoring.Console
 {
@@ -22,36 +23,22 @@ namespace NetCoreProcessMonitoring.Console
 
         static void ShowProcessess()
         {
-            Process[] processes = Process.GetProcesses();
-            foreach (Process process in processes)
+            var repo = new ProcessRepository();
+            foreach (Process process in repo.GetAllProcesses())
             {
 
-                System.Console.WriteLine($"{process.Id} - {process.ProcessName}");
+                System.Console.WriteLine($"{process.Id} - {process.Name}");
 
             }
         }
 
         static void ShowModulesFromProcess(int pid)
         {
-            Process process = Process.GetProcessById(pid);
-            foreach (var x in process.Modules)
+            var modulesRepo = new ModuleRepository();
+
+            foreach (Module module in modulesRepo.GetAllModulesForProcess(pid))
             {
-                ProcessModule asProcessModule = (ProcessModule)x;
-                if (asProcessModule == null)
-                {
-                    continue;
-                }
-                string version = "";
-                try
-                {
-                    FileVersionInfo fileVersion = asProcessModule.FileVersionInfo;
-                    version = fileVersion?.FileVersion ?? string.Empty;
-                }
-                catch (Exception)
-                {
-                    // TODO log
-                }
-                System.Console.WriteLine($"{asProcessModule.ModuleName} - {version}");
+                System.Console.WriteLine($"{module.Name} - {module.Version}");
             }
         }
     }
