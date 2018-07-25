@@ -27,7 +27,7 @@ namespace NetCoreProcessMonitoring.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }

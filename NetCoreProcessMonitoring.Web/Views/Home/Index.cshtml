@@ -1,0 +1,63 @@
+<html>
+<head>
+</head>
+<body>
+    <div id="app">
+        <div>
+        <h2>Processes</h2>
+        <ul>
+            <li v-for="process in processes">
+            <a href="javascript:;" v-on:click="selectProcess(process.id)">{{ process.id }} - {{ process.name }}</a>
+            </li>
+        </ul>
+        </div>
+        <div v-if="areModulesVisible">
+        <h2>Modules for process: {{selectedProcess}}</h2>
+            <ul>
+                <li v-for="module in modules">
+                {{ module.name }} - {{ module.version }}
+                </li>
+            </ul>
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            "processes": [],
+            "selectedProcess": -1,
+            "modules": []
+        },
+        methods:{
+            loadProcesses: function(){
+                var route = '/api/process';
+                this.$http.get(route).then((response)=>{
+                    this.processes = response.body;
+                });
+            },
+            selectProcess: function(pid){
+                this.selectedProcess = pid;
+                this.modules = [];
+                this.loadModules(pid);
+            },
+            loadModules: function(pid){
+                var route = '/api/process/'+pid;
+                this.$http.get(route).then((response)=>{
+                    this.modules = response.body;
+                });
+            }
+        },
+        computed: {
+            areModulesVisible: function(){
+                return this.selectedProcess > 0;
+            }
+        },
+        mounted(){
+            this.loadProcesses();
+        }           
+    })
+</script>
+</body>
+</html>
